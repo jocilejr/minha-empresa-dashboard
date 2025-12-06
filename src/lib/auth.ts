@@ -105,8 +105,14 @@ export const usersApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Erro ao listar usuários');
+      const text = await response.text();
+      try {
+        const error = JSON.parse(text);
+        throw new Error(error.error || 'Erro ao listar usuários');
+      } catch {
+        console.error('API Error:', text);
+        throw new Error('Erro ao listar usuários: ' + response.status);
+      }
     }
 
     return response.json();
