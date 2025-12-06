@@ -1,8 +1,6 @@
-import { Bell, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 
 const periodFilters = ["Hoje", "Ontem", "7 dias", "30 dias", "Personalizado"];
 
@@ -12,7 +10,17 @@ interface HeaderProps {
 }
 
 export function Header({ title = "Dashboard", subtitle = "Visão geral do seu negócio" }: HeaderProps) {
-  const { user } = useAuth();
+  // Get user from localStorage safely (to avoid issues if useAuth context is not ready)
+  const getUserFromStorage = () => {
+    try {
+      const userStr = localStorage.getItem('origem_viva_user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const user = getUserFromStorage();
 
   return (
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -40,7 +48,7 @@ export function Header({ title = "Dashboard", subtitle = "Visão geral do seu ne
             {user?.name?.charAt(0) || user?.username?.charAt(0) || 'U'}
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-medium text-foreground">{user?.name || user?.username}</p>
+            <p className="text-sm font-medium text-foreground">{user?.name || user?.username || 'Usuário'}</p>
             <p className="text-xs text-muted-foreground capitalize">
               {user?.roles?.[0] || 'Usuário'}
             </p>
