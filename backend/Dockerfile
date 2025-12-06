@@ -6,9 +6,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
+
+# Install dependencies (use npm install since no lock file)
+RUN npm install --omit=dev
 
 # Copy source
 COPY . .
