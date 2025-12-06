@@ -3,17 +3,64 @@
 # ============================================
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: origem-viva-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-origemviva}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-origemviva}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: origem-viva-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${DB_USER:-admin}:${DB_PASSWORD:-changeme}@postgres:5432/${DB_NAME:-origemviva}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-key-change-in-production}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Dashboard
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${API_URL:-/api}
     container_name: origem-viva-dashboard
     restart: unless-stopped
     ports:
-      - "3005:80"
+      - "${PORT:-3005}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+
+volumes:
+  postgres_data:
