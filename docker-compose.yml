@@ -67,7 +67,7 @@ services:
       retries: 3
     networks:
       - internal
-      - traefik-network
+      - PrincipalNet
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`${DOMAIN:-dashboard.origemviva.cloud}`)"
@@ -82,5 +82,5 @@ volumes:
 networks:
   internal:
     driver: bridge
-  traefik-network:
+  PrincipalNet:
     external: true
