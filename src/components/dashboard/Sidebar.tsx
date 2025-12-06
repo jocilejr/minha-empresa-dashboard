@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo-ov.png";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { authService } from "@/lib/auth";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/", badge: null },
@@ -29,12 +29,16 @@ const menuItems = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, isAdmin } = useAuth();
+
+  useEffect(() => {
+    setIsAdmin(authService.isAdmin());
+  }, []);
 
   const handleLogout = () => {
-    logout();
+    authService.logout();
     navigate('/login');
   };
 

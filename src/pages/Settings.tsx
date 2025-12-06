@@ -37,8 +37,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { usersApi, UserFull } from '@/lib/auth';
-import { useAuth } from '@/contexts/AuthContext';
+import { usersApi, UserFull, authService } from '@/lib/auth';
 import { Plus, Pencil, Trash2, Shield, User, Users } from 'lucide-react';
 
 const ROLES = [
@@ -53,7 +52,7 @@ export default function Settings() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserFull | null>(null);
   const { toast } = useToast();
-  const { user: currentUser } = useAuth();
+  const currentUser = authService.getUser();
 
   // Form state
   const [formData, setFormData] = useState({
