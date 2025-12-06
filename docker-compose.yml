@@ -1,5 +1,6 @@
 # ============================================
 # Origem Viva Dashboard - Docker Compose
+# Para uso com Portainer + Traefik
 # ============================================
 
 version: '3.8'
@@ -11,11 +12,21 @@ services:
       dockerfile: Dockerfile
     container_name: origem-viva-dashboard
     restart: unless-stopped
-    ports:
-      - "3000:80"
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.origem-viva.rule=Host(`dashboard.seudominio.com`)"
+      - "traefik.http.routers.origem-viva.entrypoints=websecure"
+      - "traefik.http.routers.origem-viva.tls.certresolver=letsencrypt"
+      - "traefik.http.services.origem-viva.loadbalancer.server.port=80"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
+networks:
+  traefik-public:
+    external: true
