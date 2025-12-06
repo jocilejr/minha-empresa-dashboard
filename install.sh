@@ -71,19 +71,19 @@ case $INSTALL_METHOD in
         
         # Build da imagem
         echo -e "${YELLOW}Construindo imagem Docker...${NC}"
-        docker-compose build
+        docker compose build
         
         # Iniciar container
         echo -e "${YELLOW}Iniciando container...${NC}"
-        docker-compose up -d
+        docker compose up -d
         
         echo -e "\n${GREEN}✓ Dashboard instalado com sucesso!${NC}"
         echo -e "\nAcesse: ${BLUE}http://localhost:3000${NC}\n"
         
         echo -e "Comandos úteis:"
-        echo -e "  ${YELLOW}docker-compose logs -f${NC}  - Ver logs"
-        echo -e "  ${YELLOW}docker-compose down${NC}    - Parar"
-        echo -e "  ${YELLOW}docker-compose up -d${NC}   - Iniciar"
+        echo -e "  ${YELLOW}docker compose logs -f${NC}  - Ver logs"
+        echo -e "  ${YELLOW}docker compose down${NC}    - Parar"
+        echo -e "  ${YELLOW}docker compose up -d${NC}   - Iniciar"
         ;;
         
     2)
