@@ -69,13 +69,15 @@ export default function Settings() {
     try {
       setIsLoading(true);
       const data = await usersApi.list();
-      setUsers(data);
+      setUsers(data || []);
     } catch (error) {
+      console.error('Error loading users:', error);
       toast({
         variant: 'destructive',
         title: 'Erro ao carregar usuários',
         description: error instanceof Error ? error.message : 'Tente novamente',
       });
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }
