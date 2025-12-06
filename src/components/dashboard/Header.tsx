@@ -2,17 +2,23 @@ import { Bell, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const periodFilters = ["Hoje", "Ontem", "7 dias", "30 dias", "Personalizado"];
 
-export function Header() {
-  const [activePeriod, setActivePeriod] = useState("Hoje");
+interface HeaderProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export function Header({ title = "Dashboard", subtitle = "Visão geral do seu negócio" }: HeaderProps) {
+  const { user } = useAuth();
 
   return (
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground text-sm">Visão geral do seu negócio</p>
+        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+        <p className="text-muted-foreground text-sm">{subtitle}</p>
       </div>
 
       <div className="flex items-center gap-4">
@@ -31,11 +37,13 @@ export function Header() {
         {/* User */}
         <div className="flex items-center gap-3 pl-4 border-l border-border">
           <div className="w-9 h-9 rounded-full bg-info flex items-center justify-center text-foreground font-semibold">
-            J
+            {user?.name?.charAt(0) || user?.username?.charAt(0) || 'U'}
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-medium text-foreground">Jocilejun</p>
-            <p className="text-xs text-muted-foreground">Administrador</p>
+            <p className="text-sm font-medium text-foreground">{user?.name || user?.username}</p>
+            <p className="text-xs text-muted-foreground capitalize">
+              {user?.roles?.[0] || 'Usuário'}
+            </p>
           </div>
         </div>
       </div>

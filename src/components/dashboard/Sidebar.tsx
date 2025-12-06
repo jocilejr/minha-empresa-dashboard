@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   ListOrdered, 
@@ -13,20 +14,31 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo-ov.png";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true, badge: null },
-  { icon: ListOrdered, label: "Transações", active: false, badge: 2 },
-  { icon: RefreshCcw, label: "Recuperação", active: false, badge: null },
-  { icon: Truck, label: "Entrega", active: false, badge: null },
-  { icon: Columns, label: "Quadros", active: false, badge: null },
-  { icon: Bot, label: "Typebots", active: false, badge: null },
-  { icon: FileText, label: "Gerar Boleto", active: false, badge: null },
-  { icon: Settings, label: "Configurações", active: false, badge: null },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/", badge: null },
+  { icon: ListOrdered, label: "Transações", path: "/transactions", badge: 2 },
+  { icon: RefreshCcw, label: "Recuperação", path: "/recovery", badge: null },
+  { icon: Truck, label: "Entrega", path: "/delivery", badge: null },
+  { icon: Columns, label: "Quadros", path: "/boards", badge: null },
+  { icon: Bot, label: "Typebots", path: "/typebots", badge: null },
+  { icon: FileText, label: "Gerar Boleto", path: "/boleto", badge: null },
+  { icon: Settings, label: "Configurações", path: "/settings", badge: null, adminOnly: true },
 ];
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logout, isAdmin } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <aside className={cn(
@@ -52,27 +64,30 @@ export function Sidebar() {
           </span>
         )}
         <ul className="mt-3 space-y-1">
-          {menuItems.map((item, index) => (
-            <li key={item.label} style={{ animationDelay: `${index * 50}ms` }} className="animate-slide-in">
-              <a
-                href="#"
-                className={cn(
-                  "sidebar-item",
-                  item.active && "sidebar-item-active"
-                )}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && (
-                  <span className="flex-1">{item.label}</span>
-                )}
-                {!collapsed && item.badge && (
-                  <span className="bg-warning text-warning-foreground text-xs font-medium px-2 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </a>
-            </li>
-          ))}
+          {filteredMenuItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.label} style={{ animationDelay: `${index * 50}ms` }} className="animate-slide-in">
+                <button
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "sidebar-item w-full",
+                    isActive && "sidebar-item-active"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="flex-1 text-left">{item.label}</span>
+                  )}
+                  {!collapsed && item.badge && (
+                    <span className="bg-warning text-warning-foreground text-xs font-medium px-2 py-0.5 rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
@@ -85,7 +100,10 @@ export function Sidebar() {
           <ChevronLeft className={cn("w-5 h-5 transition-transform", collapsed && "rotate-180")} />
           {!collapsed && <span>Recolher</span>}
         </button>
-        <button className="sidebar-item w-full text-destructive hover:text-destructive">
+        <button 
+          onClick={handleLogout}
+          className="sidebar-item w-full text-destructive hover:text-destructive"
+        >
           <LogOut className="w-5 h-5" />
           {!collapsed && <span>Sair</span>}
         </button>
