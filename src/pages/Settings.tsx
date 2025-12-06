@@ -39,6 +39,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { usersApi, UserFull, authService } from '@/lib/auth';
 import { Plus, Pencil, Trash2, Shield, User, Users } from 'lucide-react';
+import { WebhookDocumentation } from '@/components/settings/WebhookDocumentation';
 
 const ROLES = [
   { value: 'admin', label: 'Administrador', description: 'Acesso total ao sistema' },
@@ -410,6 +411,9 @@ export default function Settings() {
             )}
           </CardContent>
         </Card>
+
+        {/* Webhook Documentation */}
+        <WebhookDocumentation />
 
         {/* Edit User Dialog */}
         <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
