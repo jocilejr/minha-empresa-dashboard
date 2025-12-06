@@ -3,8 +3,6 @@
 # Para uso com Portainer + Traefik
 # ============================================
 
-version: '3.8'
-
 services:
   dashboard:
     build:
@@ -13,7 +11,7 @@ services:
     container_name: origem-viva-dashboard
     restart: unless-stopped
     networks:
-      - traefik-public
+      - PrincipalNet
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.origem-viva.rule=Host(`dashboard.seudominio.com`)"
@@ -28,5 +26,5 @@ services:
       start_period: 10s
 
 networks:
-  traefik-public:
+  PrincipalNet:
     external: true
