@@ -13,7 +13,7 @@ export async function apiFetch<T>(endpoint: string, options: FetchOptions = {}):
   };
 
   if (authenticated) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('origem_viva_token');
     if (token) {
       (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
