@@ -46,6 +46,18 @@ const ROLES = [
   { value: 'user', label: 'Usuário', description: 'Apenas visualização' },
 ];
 
+// Helper to safely get roles as array
+const getRolesArray = (roles: unknown): string[] => {
+  if (!roles) return [];
+  if (Array.isArray(roles)) return roles.filter(Boolean);
+  if (typeof roles === 'string') {
+    // Handle PostgreSQL array format like "{admin,user}"
+    const cleaned = roles.replace(/[{}]/g, '');
+    return cleaned ? cleaned.split(',').filter(Boolean) : [];
+  }
+  return [];
+};
+
 export default function Settings() {
   const [users, setUsers] = useState<UserFull[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -167,7 +179,7 @@ export default function Settings() {
       name: user.name || '',
       email: user.email || '',
       active: user.active,
-      roles: user.roles?.filter(Boolean) || [],
+      roles: getRolesArray(user.roles),
     });
     setEditingUser(user);
   };
@@ -339,7 +351,7 @@ export default function Settings() {
                       <TableCell>{user.email || '-'}</TableCell>
                       <TableCell>
                         <div className="flex gap-1 flex-wrap">
-                          {user.roles?.filter(Boolean).map((role) => (
+                          {getRolesArray(user.roles).map((role) => (
                             <Badge key={role} variant={getRoleBadgeVariant(role)}>
                               {role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
                               {role}
